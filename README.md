@@ -6,5 +6,7 @@ It utilizes tools such as Leaflet for the Map API as well as Vue.js for the fram
 
 Setup the project (must have npm installed prior to the following commands):
 
-npm install -g @vue/cli
+Navigate to /wjroutemap
+npm install
+npm run serve
 
