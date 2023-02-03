@@ -1,35 +1,28 @@
 <template>
-
-    <div style="height:600px; width:800px">
-      <l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
-        <l-tile-layer
-          url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db"
-          layer-type="base"
-          name="OpenStreetMap"
-        ></l-tile-layer>
-        <l-marker
-        :key = "index"
-        v-for="(dest, index) in dests"
-        :lat-lng="latLng(dest.latitude, dest.longitude)" 
-        
-        
-        >
-        <l-icon
-        :icon-size = "iconSize"
-        :icon-url ="icon">
-
-
-        </l-icon>
-    
-    </l-marker>
-      </l-map>
-    </div>
-  </template>
+  <div style="height:600px; width:800px">
+    <l-map ref="map" v-model:zoom="zoom" :center="[50, -100]" maxZoom=7 minZoom=2>
+      <l-tile-layer url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db" layer-type="base" name="OpenStreetMap"></l-tile-layer>
+      <l-marker v-for="(dest, index) in dests" :key="index" 
+          :lat-lng="latLng(dest.latitude, dest.longitude)">
+        <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
+        <l-tooltip> 
+          {{ dest.name }}, {{dest.countryName}}</l-tooltip>
+        <l-popup>You have selecter {{ dest.name }}'s popup.</l-popup>
+      </l-marker>
+    </l-map>
+  </div>
+</template>
   
   <script>
   import "leaflet/dist/leaflet.css";
-  import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
-
+  import {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LIcon,
+    LTooltip,
+    LPopup,
+  } from "@vue-leaflet/vue-leaflet";
   import westjet from '../assets/westjet.png'
   
   export default {
@@ -41,7 +34,9 @@
       LMap,
       LTileLayer,
       LMarker,
-      LIcon
+      LIcon,
+      LPopup,
+      LTooltip,
     },
     data() {
       return {
