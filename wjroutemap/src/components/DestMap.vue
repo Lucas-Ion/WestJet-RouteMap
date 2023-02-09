@@ -1,10 +1,13 @@
 <template>
   <div style="height:600px; width:800px">
+
     <l-map ref="map" :zoom="zoom" :center="center" maxZoom="7" minZoom="4">
       <l-tile-layer url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db" layer-type="base" name="OpenStreetMap"></l-tile-layer>
       <l-marker :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)">
         <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
         <l-popup> You have selected {{dest.name}}'s airport </l-popup>
+        <l-tooltip> 
+          {{ dest.name }}, {{dest.countryName}}</l-tooltip>
       </l-marker>
     </l-map>
   </div>
@@ -17,6 +20,7 @@
     LTileLayer,
     LMarker,
     LIcon,
+    LTooltip,
     LPopup,
   } from "@vue-leaflet/vue-leaflet";
   import westjet from '../assets/westjet.png'
@@ -31,6 +35,7 @@
       LMarker,
       LIcon,
       LPopup,
+      LTooltip,
     },
     data() {
       return {
