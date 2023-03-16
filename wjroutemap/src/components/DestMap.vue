@@ -10,15 +10,11 @@
         <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
         <l-popup> You have selected {{ dest.name }}'s airport <br>
          
-          Price: {{ dispPrice(dest.code) }}
+          Price: {{ getPrice(dest.code) }}
         </l-popup>
         <l-tooltip>
           {{ dest.name }}, {{ dest.countryName }}, {{getPrice(dest.code)}}</l-tooltip>
       </l-marker>
- 
- 
- 
- 
     </l-map>
   </div>
  </template>
@@ -72,18 +68,16 @@
         });
       }
     },
-    dispPrice: async function (cityCode){
-      const result = await this.getPrice(cityCode);
-      console.log(result)
+    // dispPrice: async function (cityCode){
+    //   const result = await this.getPrice(cityCode);
+    //   console.log(result)
+    //   return result;
+ 
+    // },
+    getPrice: function (destination) {
  
  
- 
- 
-    },
-    getPrice: async function (destination) {
- 
- 
-      let accesscode = "YYC"+ destination
+      let route = "YYC"+ destination
  
  
       let value = ""
@@ -94,44 +88,36 @@
  
       const params = new URLSearchParams();
       params.append('o', 'YYC');
-      console.log(destination)
+      //console.log(destination)
       params.append('d', destination);
-      params.append('sourceCountryCode', 'CA');
-      params.append('rangeStartOffset', '30');
+      //params.append('sourceCountryCode', 'CA');
+      params.append('rangeStartOffset', '0');
       params.append('rangeEndOffset', '60');
-      params.append('iwe', '1');
-      params.append('iwe', '2');
-      params.append('iwe', '3');
-      params.append('iwe', '4');
-      params.append('iwe', '5');
+
      
  
- 
-      const response = await axios.get('https://api.westjet.com/price-points/v1/retail', {
+      const response = axios.get('https://api.westjet.com/price-points/v1/retail', {
         params: params,
         headers: {
           'accept': 'application/json'
         }
-      }).then(response => value = (response.data[accesscode][0].price)).catch(error => {
-   console.log(error)
- });
-       
- 
+      }).then(response => {
+        value = (response.data[route][0].price);
+      }).catch(error => {
+        console.log(error)
+      });
  
       if (value == 'undefined'){
         value = 'Price Not Available'
       }
-     
-     
- 
- 
-     
+      
+      //console.log(route + " " + value)
+      return value;
     },
   },
   mounted() {
     this.getLocation()
- 
- 
+
   },
  };
  </script>
