@@ -1,13 +1,12 @@
 <template>
-  <div style="height:600px; width:800px">
+  <div style="height:1000px; width:1300px">
     <l-map ref="map" :zoom="zoom" :center="center" maxZoom="7" minZoom="4">
       <div class="search-overlay">
         <input type="text" placeholder="Search" v-model="searchQuery" @keyup.enter="search(searchQuery, dests)">
       </div>
       <l-tile-layer url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db" layer-type="base" name="OpenStreetMap"></l-tile-layer>
-      <l-marker :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)">
+      <l-marker ref="markers" :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)" @click="openPopup(dest, index)">
         <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
-        <l-popup> You have selected {{dest.name}}'s airport </l-popup>
         <l-tooltip> {{ dest.name }}, {{dest.countryName}} </l-tooltip>
       </l-marker>
     </l-map>
@@ -21,9 +20,9 @@
     LTileLayer,
     LMarker,
     LIcon,
-    LTooltip,
-    LPopup,
+    LTooltip
   } from "@vue-leaflet/vue-leaflet";
+
   import westjet from '../assets/westjet.png';
   export default {
     name: 'DestMap',
@@ -35,7 +34,6 @@
       LTileLayer,
       LMarker,
       LIcon,
-      LPopup,
       LTooltip,
     },
     data() {
@@ -75,6 +73,44 @@
           }
         }
       },
+      openPopup: async function(dest, index) {
+        let marker = this.$refs.markers[index].leafletObject;
+        
+        const price = await this.getPrice(dest.code);
+
+        let popupContent = `You have selected ${dest.name}'s airport <br> Price: ${price}`;
+        marker.unbindPopup().bindPopup(popupContent).openPopup();
+
+      },
+      getPrice: async function (destination) {
+ 
+        let route = "YYC"+ destination
+
+        const axios = require('axios');
+
+        let price = ""
+
+        const params = new URLSearchParams();
+        params.append('o', 'YYC');
+        params.append('d', destination);
+        params.append('rangeStartOffset', '0');
+        params.append('rangeEndOffset', '60');
+
+        try{
+          const response = await axios.get('https://api.westjet.com/price-points/v1/retail', {
+            params: params,
+            headers: {
+              'accept': 'application/json'
+            }
+          });
+          price = response.data[route][0].price;
+        } catch(error) {
+          console.log(error);
+          price = "No price available.";
+        }
+
+        return price;
+      }
     },
     mounted() {
       this.getLocation()
