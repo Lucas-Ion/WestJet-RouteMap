@@ -14,7 +14,11 @@
 </template>
   
 <script>
-  import "leaflet/dist/leaflet.css";
+  import 'leaflet';
+  import 'leaflet.markercluster';
+
+  const L = window['L'];
+
   import {
     LMap,
     LTileLayer,
@@ -23,6 +27,7 @@
     LTooltip
   } from "@vue-leaflet/vue-leaflet";
 
+  
   import westjet from '../assets/westjet.png';
   export default {
     name: 'DestMap',
@@ -113,7 +118,17 @@
       }
     },
     mounted() {
-      this.getLocation()
+      this.getLocation();
+
+      let markers = L.markerClusterGroup();
+      
+      let map = this.$refs.map.leafletObject;
+
+      for(let marker in (this.$refs.markers)) {
+        markers.addLayer(marker.leafletObject);
+      }
+
+      map.addLayer(markers);
     }
   };
 </script>
