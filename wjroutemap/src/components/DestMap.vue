@@ -1,34 +1,31 @@
 <template>
   <div style="height:1000px; width:1300px">
- 
- 
     <l-map ref="map" :zoom="zoom" :center="center" maxZoom="7" minZoom="4">
-      <l-tile-layer
+      <l-tile-layer ref="tilelayer"
         url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db"
         layer-type="base" name="OpenStreetMap"></l-tile-layer>
-      <l-marker :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)">
+      <l-marker ref="markers" :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)" @click="openPopup(dest, index)">
         <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
-        <l-popup> You have selected {{ dest.name }}'s airport <br>
-         
-          Price: {{ getPrice(dest.code) }}
-        </l-popup>
         <l-tooltip>
-          {{ dest.name }}, {{ dest.countryName }}, {{getPrice(dest.code)}}</l-tooltip>
+          {{ dest.name }}, {{ dest.countryName }}</l-tooltip>
       </l-marker>
     </l-map>
   </div>
- </template>
-  <script>
+</template>
+
+ <script>
  import "leaflet/dist/leaflet.css";
  import {
   LMap,
   LTileLayer,
   LMarker,
   LIcon,
-  LTooltip,
-  LPopup,
+  LTooltip
  } from "@vue-leaflet/vue-leaflet";
- import westjet from '../assets/westjet.png'
+
+ import westjet from '../assets/westjet.png';
+
+
  export default {
   name: 'DestMap',
   props: {
@@ -39,8 +36,7 @@
     LTileLayer,
     LMarker,
     LIcon,
-    LPopup,
-    LTooltip,
+    LTooltip
   },
   data() {
     return {
@@ -50,14 +46,21 @@
       center: [47.313220, -1.319482], //default
       markerLatLngBob: [47.313220, -17.319482],
       icon: westjet,
-      iconSize: [40, 25],
+      iconSize: [40, 25] 
     };
   },
   methods: {
     latLng: function (lat, lng) {
- 
- 
       return [lat, lng]
+    },
+    openPopup: async function(dest, index) {
+      let marker = this.$refs.markers[index].leafletObject;
+      
+      const price = await this.getPrice(dest.code);
+
+      let popupContent = `You have selected ${dest.name}'s airport <br> Price: ${price}`;
+      marker.unbindPopup().bindPopup(popupContent).openPopup();
+
     },
     getLocation: function () {
       if (navigator.geolocation) {
@@ -68,67 +71,44 @@
         });
       }
     },
-    // dispPrice: async function (cityCode){
-    //   const result = await this.getPrice(cityCode);
-    //   console.log(result)
-    //   return result;
- 
-    // },
-    getPrice: function (destination) {
- 
+    getPrice: async function (destination) {
  
       let route = "YYC"+ destination
- 
- 
-      let value = ""
- 
- 
+
       const axios = require('axios');
- 
- 
+
+      let price = ""
+
       const params = new URLSearchParams();
       params.append('o', 'YYC');
-      //console.log(destination)
       params.append('d', destination);
-      //params.append('sourceCountryCode', 'CA');
       params.append('rangeStartOffset', '0');
       params.append('rangeEndOffset', '60');
 
-     
- 
-      const response = axios.get('https://api.westjet.com/price-points/v1/retail', {
-        params: params,
-        headers: {
-          'accept': 'application/json'
-        }
-      }).then(response => {
-        value = (response.data[route][0].price);
-      }).catch(error => {
-        console.log(error)
-      });
- 
-      if (value == 'undefined'){
-        value = 'Price Not Available'
+      try{
+        const response = await axios.get('https://api.westjet.com/price-points/v1/retail', {
+          params: params,
+          headers: {
+            'accept': 'application/json'
+          }
+        });
+        price = response.data[route][0].price;
+      } catch(error) {
+        console.log(error);
+        price = "no price available.";
       }
-      
-      //console.log(route + " " + value)
-      return value;
+
+      return price;
     },
   },
   mounted() {
     this.getLocation()
 
-  },
+  }
  };
- </script>
-  <style>
+</script>
+<style>
  .leaflet-container {
   border-radius: 25px;
  }
- </style>
- 
- 
-   
-   
- 
- 
+</style>
