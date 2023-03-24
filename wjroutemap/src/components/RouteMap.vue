@@ -19,7 +19,7 @@
       <!-- left column -->
       <div class="ml-5 col-12">
         <h1 class="mt-5 mb-5">Map</h1>
-        <DestMap :dests="dests"/>
+        <DestMap v-if="destsLoaded" :dests="dests"/>
         <!-- Insert Map Here -->
  
  
@@ -35,7 +35,7 @@
  
   </div>
   <!-- container -->
- </template>
+</template>
  
  
  <script>
@@ -48,6 +48,7 @@
   name: 'RouteMap',
   data: function () {
     return {
+      destsLoaded: false,
       dests: []
     }
   },
@@ -59,39 +60,11 @@
     console.log('mounted');
     axios.get('https://api.westjet.com/destination-service/v1/en-CA/airports')
       .then((r) => {
-        console.log(r.data.airports)
+        console.log("parentMounted")
         this.dests = r.data.airports
+        this.destsLoaded = true;
       })
   }
- //   mounted: function () {
- //     // const axios = require('axios');
- 
- 
- //     // const params = new URLSearchParams();
- //     // params.append('o', 'YEG');
- //     // params.append('d', 'YYC');
- //     // params.append('d', 'YYZ');
- //     // params.append('sourceCountryCode', 'CA');
- //     // params.append('rangeStartOffset', '30');
- //     // params.append('rangeEndOffset', '60');
- //     // params.append('iwe', '1');
- //     // params.append('iwe', '2');
- //     // params.append('iwe', '3');
- //     // params.append('iwe', '4');
- //     // params.append('iwe', '5');
- 
- 
- //     // const response = axios.get('https://api.westjet.com/price-points/v1/retail', {
- //     //   params: params,
- //     //   headers: {
- //     //     'accept': 'application/json'
- //     //   }
- //     // });
- 
- 
-   
- //   },
- 
  
  }
  </script>
