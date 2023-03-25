@@ -2,7 +2,16 @@
   <div style="height:1000px; width:1300px">
     <l-map ref="map" :zoom="zoom" :center="center" maxZoom="7" minZoom="4">
       <div class="search-overlay">
-        <input type="text" placeholder="Search" v-model="searchQuery" @keyup.enter="search(searchQuery, dests)">
+        <input type="text" class="search-overlay" placeholder="Search" v-model="searchTerm" @input="updateSuggestions(dests)" @blur="hideSuggestions">
+        <ul class="search-suggestions" v-if="showSuggestions">
+          <li
+            class="search-suggestion"
+            v-for="(suggestion, index) in suggestions"
+            :key="index"
+          >
+            {{ suggestion }}
+          </li>
+        </ul>
       </div>
       <l-tile-layer url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db" layer-type="base" name="OpenStreetMap"></l-tile-layer>
       <l-marker ref="markers" :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)" @click="openPopup(dest, index)">
@@ -45,10 +54,44 @@
         markerLatLngBob: [47.313220, -17.319482],
         icon: westjet,
         iconSize: [40, 25],
-        searchQuery: '',
+        searchTerm: '',
+        suggestions: [],
+        showSuggestions: false,
       };
     },
     methods: {
+      updateSuggestions(dests) {
+        var destinations = []
+        for(var index in dests)
+        {
+          destinations.push(dests[index].name)
+        }
+        this.suggestions = 
+          destinations.filter((suggestion) =>
+          suggestion.toLowerCase().startsWith(this.searchTerm.toLowerCase())
+        );
+
+        // Show the suggestions if there are any.
+        this.showSuggestions = this.suggestions.length > 0;
+      },
+      hideSuggestions(dests, suggestion) {
+        // Hide the suggestions when the search input loses focus.
+        console.log('hide')
+        this.showSuggestions = false;
+      },
+      selectSuggestion(dests, suggestion) {
+        // When a suggestion is clicked, update the search term and hide the suggestions.
+        this.searchTerm = suggestion;
+        this.showSuggestions = false;
+        
+        for(var index in dests)
+        {
+          if(dests[index].name === suggestion)
+          {
+            this.center = [dests[index].latitude, dests[index].longitude]
+          }
+        }
+      },
       latLng: function(lat, lng) {
         return [lat, lng]
       },
@@ -125,10 +168,10 @@
 
   .search-overlay {
     position: absolute;
-    top: 0;
-    left: -100px;
-    width: 75%;
-    height: 12%;
+    top: 10px;
+    left: 30px;
+    width: 60%;
+    height: 20%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -144,6 +187,46 @@
     background-color: white;
     width: 50%;
   }
+
+  .search-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.search-bar {
+  position: relative;
+}
+
+.search-input {
+  width: 300px;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 45px;
+  left: 30px;
+  z-index: 1;
+  width: 300px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-suggestion {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.search-suggestion:hover {
+  background-color: #f2f2f2;
+}
 
 </style>
 
