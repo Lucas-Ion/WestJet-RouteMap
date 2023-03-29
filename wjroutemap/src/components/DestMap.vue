@@ -120,16 +120,17 @@
           iconUrl: this.icon,
           iconSize: this.iconSize
         });
-
+        //<l-tooltip> {{ dest.name }}, {{dest.countryName}} </l-tooltip>
         let marker = L.marker(this.latLng(dest.latitude, dest.longitude), {icon: wjIcon, dest: dest});
         marker.on('click', this.openPopup)
+        marker.bindTooltip(`${dest.name}, ${dest.countryName}`)
         return marker;
       }
     },
     mounted() {
 
       this.getLocation();
-      //console.log(this.dests)
+      
       var map = L.map("map").setView([47.313220, -1.319482], 4);
 
       L.tileLayer(
@@ -142,7 +143,7 @@
       ).addTo(map);
       
       let markers = L.markerClusterGroup();
-      
+
       // create a marker for each airport
       for(let dest of this.dests) {
     
