@@ -29,6 +29,7 @@
   } from "@vue-leaflet/vue-leaflet";
   import westjet from '../assets/westjet.png';
 import { map } from "leaflet";
+import { conditionalExpression } from "@babel/types";
   export default {
     name: 'DestMap',
     props: {
@@ -55,10 +56,12 @@ import { map } from "leaflet";
         suggestion: '',
         showSuggestions: false,
         placeholderText: 'Location Not Selected',
+        currentLocationAirportCode: 'YYC',
       };
     },
     methods: {
       updateSuggestions(dests) {
+        
         var destinations = []
         for (var index in dests) {
           destinations.push([dests[index].name, dests[index].countryName])
@@ -82,6 +85,7 @@ import { map } from "leaflet";
           if (dests[index].name === suggestion[0]) {
             this.center = [dests[index].latitude, dests[index].longitude];
             this.placeholderText = dests[index].name;
+            this.currentLocationAirportCode = dests[index].code;
           }
         }
       },
@@ -104,11 +108,15 @@ import { map } from "leaflet";
         marker.unbindPopup().bindPopup(popupContent).openPopup();
       },
       getPrice: async function(destination) {
-        let route = "YYC" + destination
+        if(destination == this.currentLocationAirportCode)
+        {
+          return "This is your current departure location";
+        }
+        let route = this.currentLocationAirportCode + destination;
         const axios = require('axios');
         let price = ""
         const params = new URLSearchParams();
-        params.append('o', 'YYC');
+        params.append('o', this.currentLocationAirportCode);
         params.append('d', destination);
         params.append('rangeStartOffset', '0');
         params.append('rangeEndOffset', '60');
@@ -128,7 +136,7 @@ import { map } from "leaflet";
       }
     },
     mounted() {
-      this.getLocation()
+      this.getLocation();
     }
   };
 </script>
