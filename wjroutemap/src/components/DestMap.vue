@@ -1,7 +1,6 @@
 <template>
   <div style="height:1000px; width:1300px">
-    <l-map ref="map" :zoom="zoom" :center="center" :maxZoom=7 :minZoom=4>
-      <div class="search-overlay">
+    <div class="search-overlay">
         <input type="text" class="search-overlay" :placeholder="'From: ' + placeholderText" v-model="searchTerm" @input="updateSuggestions(dests)" @blur="hideSuggestions">
         <ul class="search-suggestions" v-if="showSuggestions">
           <li class="search-suggestion" v-for="(suggestion, index) in suggestions" :key="index" @mousedown="selectSuggestion(dests, suggestion)">
@@ -9,6 +8,7 @@
           </li>
         </ul>
       </div>
+    <l-map ref="map" :zoom="zoom" :center="center" :maxZoom=7 :minZoom=4>
       <l-tile-layer url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db" layer-type="base" name="OpenStreetMap"></l-tile-layer>
       <l-marker ref="markers" :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)" @click="openPopup(dest, index)">
         <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
@@ -147,8 +147,8 @@ import { conditionalExpression } from "@babel/types";
   }
   .search-overlay {
     position: absolute;
-    top: 10px;
-    left: 30px;
+    top: 140px;
+    left: 195px;
     width: 60%;
     height: 20%;
     display: flex;
@@ -185,8 +185,8 @@ import { conditionalExpression } from "@babel/types";
   }
   .search-suggestions {
     position: absolute;
-    top: 45px;
-    left: 30px;
+    top: 180px;
+    left: 200px;
     z-index: 1;
     width: 300px;
     margin: 0;
