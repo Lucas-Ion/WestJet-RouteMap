@@ -1,6 +1,7 @@
 <template>
   <div style="height:1000px; width:1300px">
-    <l-map ref="map" :zoom="zoom" :center="center" maxZoom="7" minZoom="4">
+    <div id="map" style="height:1000px; width:1300px"></div>
+    <!-- <l-map ref="map" :zoom="zoom" :center="center" maxZoom="7" minZoom="4">
       <div class="search-overlay">
         <input type="text" placeholder="Search" v-model="searchQuery" @keyup.enter="search(searchQuery, dests)">
       </div>
@@ -9,19 +10,16 @@
         <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
         <l-tooltip> {{ dest.name }}, {{dest.countryName}} </l-tooltip>
       </l-marker>
-    </l-map>
+    </l-map> -->
   </div>
 </template>
   
 <script>
   import "leaflet/dist/leaflet.css";
-  import {
-    LMap,
-    LTileLayer,
-    LMarker,
-    LIcon,
-    LTooltip
-  } from "@vue-leaflet/vue-leaflet";
+  import * as L from 'leaflet';
+  import 'leaflet.markercluster';
+  import 'leaflet.markercluster/dist/MarkerCluster.css';
+  import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 
   import westjet from '../assets/westjet.png';
   export default {
@@ -29,13 +27,13 @@
     props: {
       dests: Array
     },
-    components: {
-      LMap,
-      LTileLayer,
-      LMarker,
-      LIcon,
-      LTooltip,
-    },
+    // components: {
+    //   LMap,
+    //   LTileLayer,
+    //   LMarker,
+    //   LIcon,
+    //   LTooltip,
+    // },
     data() {
       return {
         url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db',
@@ -46,6 +44,7 @@
         icon: westjet,
         iconSize: [40, 25],
         searchQuery: '',
+        
       };
     },
     methods: {
@@ -73,12 +72,13 @@
           }
         }
       },
-      openPopup: async function(dest, index) {
-        let marker = this.$refs.markers[index].leafletObject;
-        
+      openPopup: async function(e) {
+        let marker = e.target
+        let dest = marker.options.dest
+        //console.log(marker.options.dest.code)
         const price = await this.getPrice(dest.code);
 
-        let popupContent = `You have selected ${dest.name}'s airport <br> Price: ${price}`;
+        let popupContent = `You have selected ${dest.name}'s airport <br> Price: $${price}`;
         marker.unbindPopup().bindPopup(popupContent).openPopup();
 
       },
@@ -104,16 +104,55 @@
             }
           });
           price = response.data[route][0].price;
+          if(response.data[route][0].status === "NO_SCHEDULES"){
+            console.log("h")
+            price = "This is a seasonal route that is currently not being served."
+          }
         } catch(error) {
           console.log(error);
           price = "No price available.";
         }
-
+        console.log(price)
         return price;
+      },
+      createMarker(dest) {
+        let wjIcon = L.icon({
+          iconUrl: this.icon,
+          iconSize: this.iconSize
+        });
+        //<l-tooltip> {{ dest.name }}, {{dest.countryName}} </l-tooltip>
+        let marker = L.marker(this.latLng(dest.latitude, dest.longitude), {icon: wjIcon, dest: dest});
+        marker.on('click', this.openPopup)
+        marker.bindTooltip(`${dest.name}, ${dest.countryName}`)
+        return marker;
       }
     },
     mounted() {
-      this.getLocation()
+
+      this.getLocation();
+      
+      var map = L.map("map").setView([47.313220, -1.319482], 4);
+
+      L.tileLayer(
+        "https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db",
+        {
+          minZoom: 4,
+          maxZoom: 7,
+          attribution: 'Maps <a href=&copy; https://www.thunderforest.com/>Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap Contributors</a>'
+        }
+      ).addTo(map);
+      
+      let markers = L.markerClusterGroup();
+
+      // create a marker for each airport
+      for(let dest of this.dests) {
+    
+        let marker = this.createMarker(dest)
+        markers.addLayer(marker)
+
+      }
+
+      map.addLayer(markers);
     }
   };
 </script>
