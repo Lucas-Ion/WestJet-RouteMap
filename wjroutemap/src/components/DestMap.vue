@@ -2,7 +2,7 @@
   <div style="height:1000px; width:1300px">
     <l-map ref="map" :zoom="zoom" :center="center" :maxZoom=7 :minZoom=4>
       <div class="search-overlay">
-        <input type="text" class="search-overlay" placeholder="Search" v-model="searchTerm" @input="updateSuggestions(dests)" @blur="hideSuggestions">
+        <input type="text" class="search-overlay" :placeholder="'From: ' + placeholderText" v-model="searchTerm" @input="updateSuggestions(dests)" @blur="hideSuggestions">
         <ul class="search-suggestions" v-if="showSuggestions">
           <li class="search-suggestion" v-for="(suggestion, index) in suggestions" :key="index" @mousedown="selectSuggestion(dests, suggestion)">
             {{ suggestion[0] + ", " + suggestion[1] }}
@@ -54,6 +54,7 @@ import { map } from "leaflet";
         suggestions: [],
         suggestion: '',
         showSuggestions: false,
+        placeholderText: 'Location Not Selected',
       };
     },
     methods: {
@@ -79,7 +80,8 @@ import { map } from "leaflet";
         this.showSuggestions = false;
         for (var index in dests) {
           if (dests[index].name === suggestion[0]) {
-            this.center = [dests[index].latitude, dests[index].longitude]
+            this.center = [dests[index].latitude, dests[index].longitude];
+            this.placeholderText = dests[index].name;
           }
         }
       },
