@@ -56,10 +56,8 @@
     DestMap,
   },
   mounted: function () {
-    console.log('mounted');
     axios.get('https://api.westjet.com/destination-service/v1/en-CA/airports')
       .then((r) => {
-        console.log(r.data.airports)
         this.dests = r.data.airports
       })
   }
