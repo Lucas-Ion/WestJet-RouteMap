@@ -4,7 +4,12 @@
  
  
       <div class="col-12">
-        <h1 class="text-center text-info">WestJet Route Finder</h1>
+        <nav class="navbar navbar-light bg-light mt-0 mb-5">
+          <a class="navbar-brand" href="https://www.westjet.com/en-ca">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/WestJet_Logo.svg/2560px-WestJet_Logo.svg.png" width="225" height="30" class="d-inline-block align-top mx-3" alt="">
+           <span class="mt-5">Route Map</span>
+          </a>
+        </nav>
  
  
       </div>
@@ -18,7 +23,6 @@
  
       <!-- left column -->
       <div class="ml-5 col-12">
-        <h1 class="mt-5 mb-5">Map</h1>
         <DestMap v-if="destsLoaded" :dests="dests"/>
         <!-- Insert Map Here -->
  

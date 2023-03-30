@@ -1,16 +1,7 @@
 <template>
   <div style="height:1000px; width:1300px">
     <div id="map" style="height:1000px; width:1300px"></div>
-    <!-- <l-map ref="map" :zoom="zoom" :center="center" maxZoom="7" minZoom="4">
-      <div class="search-overlay">
-        <input type="text" placeholder="Search" v-model="searchQuery" @keyup.enter="search(searchQuery, dests)">
-      </div>
-      <l-tile-layer url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db" layer-type="base" name="OpenStreetMap"></l-tile-layer>
-      <l-marker ref="markers" :key="index" v-for="(dest, index) in dests" :lat-lng="latLng(dest.latitude, dest.longitude)" @click="openPopup(dest, index)">
-        <l-icon :icon-size="iconSize" :icon-url="icon"></l-icon>
-        <l-tooltip> {{ dest.name }}, {{dest.countryName}} </l-tooltip>
-      </l-marker>
-    </l-map> -->
+
   </div>
 </template>
   
@@ -36,14 +27,15 @@
     // },
     data() {
       return {
-        url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db',
+        url: 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
         attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
         zoom: 4,
         center: [47.313220, -1.319482], //default
         markerLatLngBob: [47.313220, -17.319482],
         icon: westjet,
-        iconSize: [40, 25],
+        iconSize: [85, 50],
         searchQuery: '',
+        noWrap: true,
         
       };
     },
@@ -78,8 +70,22 @@
         //console.log(marker.options.dest.code)
         const price = await this.getPrice(dest.code);
 
-        let popupContent = `You have selected ${dest.name}'s airport <br> Price: $${price}`;
-        marker.unbindPopup().bindPopup(popupContent).openPopup();
+        let popupContent = `<h1 class ='h6 text-center'> ${dest.name} <br> $${price} </h1> <br>`;
+        console.log(dest)
+         let imageSource = `<img src="https://www.westjet.com/assets/wj-web/images/en/destination-defaults/square/${dest.code.toLowerCase()}-square.jpg"  width="200" 
+     height="200" border-radius: 50%;> </img>`
+         console.log(imageSource)
+         popupContent = popupContent +  imageSource
+        // + '<br>' + "<img src='" + 
+        // 'https://images.unsplash.com/photo-1493134799591-2c9eed26201a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2l0eSUyMHNreWxpbmV8ZW58MHx8MHx8&w=1000&q=80' + "'/>";
+        marker.unbindPopup().bindPopup(popupContent,
+        
+         {maxWidth: "auto", maxHeight: "auto"},
+        
+        
+        
+        
+        ).openPopup();
 
       },
       getPrice: async function (destination) {
@@ -122,23 +128,44 @@
         });
         //<l-tooltip> {{ dest.name }}, {{dest.countryName}} </l-tooltip>
         let marker = L.marker(this.latLng(dest.latitude, dest.longitude), {icon: wjIcon, dest: dest});
+        marker.bindTooltip("12" ,{
+        permanent: true, 
+        direction: 'top',
+        offset: [0,-17],
+    });
         marker.on('click', this.openPopup)
         marker.bindTooltip(`${dest.name}, ${dest.countryName}`)
+      
         return marker;
-      }
+      },
+
+
+      customTip() {
+    this.unbindTooltip();
+    if(!this.isPopupOpen()) this.bindTooltip('Short description').openTooltip();
+    },
+
+     customPop() {
+    this.unbindTooltip();
+    }
+      
     },
     mounted() {
 
       this.getLocation();
       
       var map = L.map("map").setView([47.313220, -1.319482], 4);
+      
+
 
       L.tileLayer(
-        "https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db",
+        'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
         {
           minZoom: 4,
-          maxZoom: 7,
-          attribution: 'Maps <a href=&copy; https://www.thunderforest.com/>Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap Contributors</a>'
+          maxZoom: 8,
+          attribution: 'Maps <a href=&copy; https://www.thunderforest.com/>Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap Contributors</a>',
+          
+          
         }
       ).addTo(map);
       
@@ -153,6 +180,7 @@
       }
 
       map.addLayer(markers);
+      map.setMaxBounds(  [[-90,-180],   [90,180]]  )
     }
   };
 </script>
