@@ -46,9 +46,11 @@
     // },
     data() {
       return {
+        map: null,
         url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db',
-        attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        zoom: 4,
+        attribution: 'Maps <a href=&copy; https://www.thunderforest.com/>Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap Contributors</a>',
+        minZoom: 4,
+        maxZoom: 7,
         center: [47.313220, -1.319482], //default
         markerLatLngBob: [47.313220, -17.319482],
         icon: westjet,
@@ -61,6 +63,12 @@
         currentLocationAirportCode: 'YYC'
       };
     },
+    watch: {
+    // whenever center changes, this function will run
+    center(newCenter, oldCenter) {
+      this.map.setView(newCenter, this.maxZoom);
+    }
+  },
     methods: {
       updateSuggestions(dests) {
         
@@ -99,7 +107,7 @@
           navigator.geolocation.getCurrentPosition((position) => {
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
-            this.center = [latitude, longitude]
+            this.center = [latitude, longitude];
           });
         }
       },
@@ -165,19 +173,17 @@
       }
     },
     mounted() {
-
-      this.getLocation();
       
-      var map = L.map("map").setView([47.313220, -1.319482], 4);
+      this.map = L.map("map").setView(this.center, 4);
 
       L.tileLayer(
-        "https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=9b2313ed32304004a51c1494aedf88db",
+        this.url,
         {
-          minZoom: 4,
-          maxZoom: 7,
-          attribution: 'Maps <a href=&copy; https://www.thunderforest.com/>Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap Contributors</a>'
+          minZoom: this.minZoom,
+          maxZoom: this.maxZoom,
+          attribution: this.attribution
         }
-      ).addTo(map);
+      ).addTo(this.map);
       
       let markers = L.markerClusterGroup();
 
@@ -189,7 +195,9 @@
 
       }
 
-      map.addLayer(markers);
+      this.map.addLayer(markers);
+
+      this.getLocation();
     }
   };
 </script>
