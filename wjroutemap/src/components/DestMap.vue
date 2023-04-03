@@ -52,10 +52,11 @@ export default {
       suggestions: [],
       suggestion: '',
       showSuggestions: false,
-      placeholderText: 'Location Not Selected',
+      placeholderText: 'Calgary',
       currentLocationAirportCode: 'YYC',
       noWrap: true,
       searchQuery: '',
+      map: null,
 
     };
   },
@@ -73,6 +74,7 @@ export default {
         );
       // Show the suggestions if there are any.
       this.showSuggestions = this.suggestions.length > 0;
+      this.map.closePopup();
     },
     hideSuggestions() {
       // Hide the suggestions when the search input loses focus.
@@ -80,7 +82,7 @@ export default {
     },
     selectSuggestion(dests, suggestion) {
       // When a suggestion is clicked, update the search term and hide the suggestions.
-      this.searchTerm = suggestion[0];
+      this.searchTerm = "";
       this.showSuggestions = false;
       for (var index in dests) {
         if (dests[index].name === suggestion[0]) {
@@ -90,6 +92,12 @@ export default {
           console.log(this.currentLocationAirportCode)
         }
       }
+
+      
+      
+
+      
+
     },
     latLng: function (lat, lng) {
       return [lat, lng]
@@ -172,9 +180,22 @@ export default {
     openPopup: async function (e) {
       let marker = e.target
       let dest = marker.options.dest
+
+
+      let from_tag = "From: ";
+      let CAD_tag = " CAD"
       //console.log(marker.options.dest.code)
-      const price = await this.getPrice(dest.code);
+      const price = await this.getPrice(dest);
       const valid_image = await this.getValidImage(dest.code);
+
+      console.log(price)
+
+      if (price === "This is your current departure location" || price ==="No price available for this route." || price 
+      === "This is a seasonal route that is currently not being served."  )
+      {
+        from_tag = ""
+        CAD_tag = ""
+      }
 
       let popupContent = `<h1 style="font-weight: 200;"> ${dest.name} <br>  <div
         style = " font-size: 1rem; font-weight: 200;
@@ -183,17 +204,12 @@ export default {
    
    
     line-height: 1.2;"
-    >  From $${price} CAD <div> </h1>  `;
+    >  ${from_tag} ${price} ${CAD_tag} <div> </h1>  `;
       console.log(dest)
-
-
-
 
 
       let imageSource = `<img  style="border-radius: 10px;"src="https://www.westjet.com/assets/wj-web/images/en/destination-defaults/square/${dest.code.toLowerCase()}-square.jpg"  width="225" 
        height="225" border-radius: 25px;> </img> <br>`
-
-
 
 
       var date = new Date();
@@ -218,7 +234,7 @@ export default {
 
 
       // let button = ` <div class='text-center'> <button type="button" class="btn btn-outline-dark mt-3 px-5">Book Now!</button> </div>`
-      let button = ` <a href=https://www.westjet.com/en-ca/flights/low-fares?origin=YQL&destination=${dest.code}&outbounddate=${MyDateString} class="btn btn-outline-dark mt-3 px-5" role="button" ">Book Now!</a>`
+      let button = ` <a href=https://www.westjet.com/en-ca/flights/low-fares?origin=${this.currentLocationAirportCode}&destination=${dest.code}&outbounddate=${MyDateString} class="btn btn-outline-dark mt-3 px-5" role="button" ">Book Now!</a>`
 
 
 
@@ -244,16 +260,21 @@ export default {
 
     },
     getPrice: async function (destination) {
+      if (destination.code == this.currentLocationAirportCode) {
+        return "This is your current departure location";
+      }
 
-      let route = "YYC" + destination
+      let route = this.currentLocationAirportCode + destination.code;
+      console.log(route)
 
       const axios = require('axios');
 
-      let price = ""
+      let price = "";
+      let priceMessage = "";
 
       const params = new URLSearchParams();
-      params.append('o', 'YYC');
-      params.append('d', destination);
+      params.append('o', this.currentLocationAirportCode);
+      params.append('d', destination.code);
       params.append('rangeStartOffset', '0');
       params.append('rangeEndOffset', '60');
 
@@ -265,16 +286,17 @@ export default {
           }
         });
         price = response.data[route][0].price;
+        priceMessage = `$${price}`;
         if (response.data[route][0].status === "NO_SCHEDULES") {
-          console.log("h")
-          price = "This is a seasonal route that is currently not being served."
+
+          priceMessage = "This is a seasonal route that is currently not being served."
         }
       } catch (error) {
         console.log(error);
-        price = "No price available.";
+        priceMessage = "No price available for this route.";
       }
       console.log(price)
-      return price;
+      return priceMessage;
     },
     createMarker(dest) {
       let wjIcon = L.icon({
@@ -309,7 +331,7 @@ export default {
 
     this.getLocation();
 
-    var map = L.map("map").setView([47.313220, -1.319482], 4);
+    var map = L.map("map").setView([51.0447, -114.0719], 4);
 
 
 
@@ -336,6 +358,7 @@ export default {
 
     map.addLayer(markers);
     map.setMaxBounds([[-90, -180], [90, 180]])
+    this.map = map;
   }
 };
 </script>
@@ -413,7 +436,8 @@ input[type="text"] {
 
 .search-suggestion:hover {
   background-color: #f2f2f2;
-}</style>
+}
+</style>
 
     
     
