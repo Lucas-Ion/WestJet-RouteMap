@@ -468,7 +468,7 @@ export default {
 .search-overlay {
   position: absolute;
   top: 4.5rem;
-  left: 19rem;
+  left: 5rem;
   width: 60%;
   height: 20%;
   display: flex;
@@ -511,8 +511,8 @@ input[type="text"] {
 
 .search-suggestions {
   position: absolute;
-  top: 7.5rem;
-  left: 19rem;
+  top: 6.5rem;
+  left: 5rem;
   z-index: 1;
   width: 300px;
   margin: 0;
