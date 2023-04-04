@@ -1,7 +1,7 @@
 <!-- This is the latest version -->
 
 <template>
-  <div style="height:1000px; width:1300px">
+  <div style="width:100%;height: 95vh;">
     <div class="search-overlay">
       <input type="text" class="search-overlay" :placeholder="'From: ' + placeholderText" v-model="searchTerm"
         @input="updateSuggestions(dests)" @blur="hideSuggestions">
@@ -12,7 +12,7 @@
         </li>
       </ul>
     </div>
-    <div id="map" style="height:1000px; width:1300px"></div>
+    <div id="map" style="height:95vh; width:100%;"></div>
 
   </div>
 </template>
