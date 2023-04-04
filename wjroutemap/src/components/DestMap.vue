@@ -12,7 +12,7 @@
         </li>
       </ul>
     </div>
-    <div id="map" style="height:1000px; width:1300px"></div>
+    <div id="map" style="height:95vh; width:100%"></div>
 
   </div>
 </template>
