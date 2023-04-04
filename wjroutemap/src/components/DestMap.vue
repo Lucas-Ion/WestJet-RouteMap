@@ -25,6 +25,8 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 
 import westjet from '../assets/westjet.png';
+import defaultPopupImage from '../assets/787.jpg';
+
 import { conditionalExpression } from "@babel/types";
 
 export default {
@@ -186,7 +188,7 @@ export default {
       let CAD_tag = " CAD"
       //console.log(marker.options.dest.code)
       const price = await this.getPrice(dest);
-      const valid_image = await this.getValidImage(dest.code);
+      const imageUrl = await this.getValidImageUrl(dest.code);
 
       console.log(price)
 
@@ -199,16 +201,17 @@ export default {
 
       let popupContent = `<h1 style="font-weight: 200;"> ${dest.name} <br>  <div
         style = " font-size: 1rem; font-weight: 200;
-    font-family: "Noto Sans","Noto Sans SC","Roboto","Trebuchet MS",Arial,Sans-Serif;
-    letter-spacing: normal;
+        font-family: "Noto Sans","Noto Sans SC","Roboto","Trebuchet MS",Arial,Sans-Serif;
+        letter-spacing: normal;
    
    
-    line-height: 1.2;"
-    >  ${from_tag} ${price} ${CAD_tag} <div> </h1>  `;
+        line-height: 1.2;"
+        >  ${from_tag} ${price} ${CAD_tag} <div> </h1>  `;
+
       console.log(dest)
 
 
-      let imageSource = `<img  style="border-radius: 10px;"src="https://www.westjet.com/assets/wj-web/images/en/destination-defaults/square/${dest.code.toLowerCase()}-square.jpg"  width="225" 
+      let imageTag = `<img  style="border-radius: 10px;"src=${imageUrl}  width="225" 
        height="225" border-radius: 25px;> </img> <br>`
 
 
@@ -238,7 +241,7 @@ export default {
 
 
 
-      popupContent = popupContent + imageSource + button
+      popupContent = popupContent + imageTag + button
       // + '<br>' + "<img src='" + 
       // 'https://images.unsplash.com/photo-1493134799591-2c9eed26201a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2l0eSUyMHNreWxpbmV8ZW58MHx8MHx8&w=1000&q=80' + "'/>";
       marker.unbindPopup().bindPopup(popupContent,
@@ -251,12 +254,21 @@ export default {
       ).openPopup();
 
     },
-    getValidImage: function (dest) {
+    getValidImageUrl: async function (dest) {
 
+      let destUrl = `https://www.westjet.com/assets/wj-web/images/en/destination-defaults/square/${dest.toLowerCase()}-square.jpg`
 
+      const axios = require('axios');
 
+      // make a request to the image url to see if it exists
+      try {
+        const response = await axios.get(destUrl, {});
+      } catch(error) {
+        //error if 404, so return our default
+        return defaultPopupImage;
+      }
 
-
+      return destUrl;
 
     },
     getPrice: async function (destination) {
@@ -364,6 +376,88 @@ export default {
 </script>
   
 <style>
+/* leaflet.css styles*/
+.leaflet-container a {
+	color: #000000;
+}
+
+.leaflet-popup-content-wrapper {
+	padding: 0.25px;
+	text-align: center;
+	border-radius: 12px;
+}
+.leaflet-popup-content {
+	margin: 10px 20px 10px 16px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -15px;
+	overflow: hidden;
+	pointer-events: none;
+}
+.leaflet-popup-tip {
+	background: rgb(255, 255, 255);
+	color: #000000;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+}
+.leaflet-tooltip {
+	font-family: "Noto Sans","Noto Sans SC","Roboto","Trebuchet MS",Arial,Sans-Serif;
+	font-weight: 200;
+	position: absolute;
+	padding: 6px;
+	background-color: #01A19E;
+	border: 1px solid #01A19E;
+	border-radius: 3px;
+	color: #ffffff;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #01A19E;
+}
+/* leafletmarkercluster styles*/
+
+.marker-cluster-small {
+	background-color: #027E7B;
+	}
+.marker-cluster-small div {
+	background-color: #027E7B;
+	}
+
+.marker-cluster-medium {
+	background-color: #00203E;
+	}
+.marker-cluster-medium div {
+	background-color: #00203E;
+	}
+.marker-cluster div {
+	width: 30px;
+	height: 30px;
+	margin-left: 5px;
+	margin-top: 5px;
+
+	text-align: center;
+	border-radius: 15px;
+	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	color: white
+}
+/* above here are test changes */
+
 .leaflet-container {
   border-radius: 25px;
   color: #ffffff;
