@@ -96,9 +96,6 @@ export default {
       }
 
       
-      
-
-      
 
     },
     latLng: function (lat, lng) {
@@ -113,61 +110,7 @@ export default {
         });
       }
     },
-    // openPopup: async function (e) {
-    //   let marker = e.target
-    //   let dest = marker.options.dest
-    //   //console.log(marker.options.dest.code)
-    //   const priceMessage = await this.getPrice(dest);
-
-    //   // let popupContent = `You have selected ${dest.name}'s airport <br> Price: $${price}`;
-    //   marker.unbindPopup().bindPopup(priceMessage).openPopup();
-
-    // },
-    // getPrice: async function (destination) {
-    //   if (destination.code == this.currentLocationAirportCode) {
-    //     return "This is your current departure location";
-    //   }
-
-    //   let route = this.currentLocationAirportCode + destination.code;
-
-    //   const axios = require('axios');
-
-    //   let price = "";
-    //   let priceMessage = "";
-
-    //   const params = new URLSearchParams();
-    //   params.append('o', this.currentLocationAirportCode);
-    //   params.append('d', destination.code);
-    //   params.append('rangeStartOffset', '0');
-    //   params.append('rangeEndOffset', '60');
-
-    //   try {
-    //     const response = await axios.get('https://api.westjet.com/price-points/v1/retail', {
-    //       params: params,
-    //       headers: {
-    //         'accept': 'application/json'
-    //       }
-    //     });
-    //     price = response.data[route][0].price;
-    //     priceMessage = `You have selected ${destination.name}'s airport <br> Price: $${price}`;
-    //     if (response.data[route][0].status === "NO_SCHEDULES") {
-
-    //       priceMessage = "This is a seasonal route that is currently not being served."
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //     priceMessage = "No price available for this route.";
-    //   }
-    //   console.log(price)
-    //   return priceMessage;
-    // },
-    // createMarker(dest) {
-    //   let wjIcon = L.icon({
-    //     iconUrl: this.icon,
-    //     iconSize: this.iconSize
-    //   });
-    // },
-
+   
     search(searchQuery, dests) {
       for (var index in dests) {
         var search = searchQuery.toLowerCase()
