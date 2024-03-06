@@ -24,7 +24,3 @@ To get WestJet Explorer up and running locally:
    `npm install`
 3. Start the application:
    `npm run serve`
-
-## Contribution 🤝
-
-Contributions are welcome to enhance the application's functionality and user experience. Please adhere to the standard fork-and-pull request workflow for contributions.
