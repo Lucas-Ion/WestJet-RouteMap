@@ -28,7 +28,3 @@ To get WestJet Explorer up and running locally:
 ## Contribution 🤝
 
 Contributions are welcome to enhance the application's functionality and user experience. Please adhere to the standard fork-and-pull request workflow for contributions.
-
-## License 📄
-
-This project is available under the MIT License.
