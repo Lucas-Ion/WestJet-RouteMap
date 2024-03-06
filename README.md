@@ -10,6 +10,10 @@ WestJet Explorer is a sophisticated web application leveraging Leaflet for map i
 - **Vue.js**: Drives the responsive user interface.
 - **WestJet Pricing and Dates API**: Provides access to flight pricing and schedule information.
 
+## Video Demo 📹
+
+https://github.com/Lucas-Ion/WestJet-RouteMap/assets/65054476/72bb3ff3-a1fc-45a0-a4dc-07f5f09e34ad
+
 ## Setup 🚀
 
 To get WestJet Explorer up and running locally:
