@@ -24,3 +24,7 @@ To get WestJet Explorer up and running locally:
    `npm install`
 3. Start the application:
    `npm run serve`
+
+## Disclaimer
+
+This project was developed in collaboration with WestJet and its representatives as part of a collaborative project. It is designed for educational and demonstration purposes within an academic framework. While the project was developed with input from WestJet, it is not an official WestJet application or service, and it does not intend to mimic or replicate WestJet’s proprietary systems or services. All logos, trademarks, and company names used herein belong to their respective owners. The use of WestJet’s logo and any related trademarks in this project has been done in the context of this academic collaboration and should not be construed as an endorsement by WestJet.
